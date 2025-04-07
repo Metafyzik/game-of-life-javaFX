@@ -3,7 +3,6 @@ package application;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -77,6 +76,32 @@ public class GameOfLife extends Application {
 		return neighboors;
 	}
 	
+	public Set<CellRect> generateNewCells(Set<CellRect> liveCells, Pane pane) {
+		Set<CellRect> newBornCells = new HashSet<>();
+		
+		for (CellRect cell : liveCells) {		
+			int x = (int) cell.getX();
+			int y = (int) cell.getY();
+			
+			//mn stands for Moore Neighboors
+			int[][] mn = {{x-rectSize,y-rectSize},{x-rectSize,y},{x-rectSize,y+rectSize},  {x,y-rectSize},{x,y-rectSize},  {x+rectSize,y-rectSize},{x+rectSize,y},{x-rectSize,y+rectSize}}; 
+			
+			for (int[] coordinates :mn) {				
+				int neighboors = numOfliveCellsAround(liveCells, coordinates[0], coordinates[1]);
+				
+				if (neighboors == 3) {
+					CellRect rect = new CellRect(coordinates[0],coordinates[1]);
+									
+					//create new cell only if there is not already live cell on those coordinates and if is not an new cell created already
+					if (! (liveCells.contains(rect) || newBornCells.contains(rect))) {
+						newBornCells.add(rect);
+					}
+				}	
+			}
+		}
+		return newBornCells;
+	}
+	
     @Override
     public void start(Stage primaryStage) {  	
         // Create a pane
@@ -109,7 +134,16 @@ public class GameOfLife extends Application {
                 	if (!allowUserInput) {
                 		//evaluate which live cells will not survive
                 		Set<CellRect> cellsToDie = cellsToDie(liveCells);
+                		//evalute which cells should become alive
+                		Set<CellRect> newBornCells = generateNewCells(liveCells, pane);
                 		
+                		//remove dead cells
+                		liveCells.removeAll(cellsToDie);
+                        pane.getChildren().removeAll(cellsToDie);
+                		
+                        //add new born cells 
+                        liveCells.addAll(newBornCells);
+                        pane.getChildren().addAll(newBornCells);
                 	}
                     // Update last update time
                     lastUpdateTime = now;
