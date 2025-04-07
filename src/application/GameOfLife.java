@@ -111,7 +111,7 @@ public class GameOfLife extends Application {
                 	
                     // Update the game state and render the new frame
                 	if (!allowUserInput) {
-                		//evaluate which live cells will survive
+                		//evaluate which live cells will not survive
                 		Set<Rectangle> cellsToDie = cellsToDie(liveCells);
                 		
                 	}
@@ -132,5 +132,4 @@ public class GameOfLife extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }
