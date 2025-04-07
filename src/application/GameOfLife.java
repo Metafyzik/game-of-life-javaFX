@@ -86,7 +86,9 @@ public class GameOfLife extends Application {
       
         // Adding and removing live cells from user input
         pane.setOnMouseClicked((MouseEvent event) -> {
+        	if (allowUserInput) {
         		clickCells(event, liveCells, pane);
+        	}
         });
         
         //start the game by pressing SPACE
