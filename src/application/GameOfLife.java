@@ -17,9 +17,9 @@ public class GameOfLife extends Application {
     private final double FPS = 2;  // Target FPS
     private final long NANOS_PER_UPDATE = 1_000_000_000 / (long) FPS;  // Time per frame in nanoseconds
 
-	int width = 800;
-	int height = 800;
-	int rectSize = 50;
+	private final int width = Size.WINDOW_WIDTH;
+	private final int height = Size.WINDOW_HEIGHT;
+	private final int rectSize = Size.CELL_RECT_SIDE;
 	
 	boolean allowUserInput = true;
 	

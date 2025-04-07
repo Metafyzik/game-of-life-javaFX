@@ -1,21 +1,17 @@
 package application;
 
 import java.util.Objects;
-
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class CellRect extends Rectangle {
 	
-	static private final int rectSize= 50;
-	static private final int cubeArc= 25;
-	
     public CellRect(int x, int y) {
-        super(x, y, rectSize, rectSize);
+        super(x, y, Size.CELL_RECT_SIDE, Size.CELL_RECT_SIDE);
 
         this.setFill(Color.BLACK);
-        this.setArcWidth(cubeArc);
-        this.setArcHeight(cubeArc);
+        this.setArcWidth(Size.CELL_RECT_ARC);
+        this.setArcHeight(Size.CELL_RECT_ARC);
     }
 
     // Override equals to compare based on position
