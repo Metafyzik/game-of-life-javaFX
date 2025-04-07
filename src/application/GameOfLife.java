@@ -22,19 +22,19 @@ public class GameOfLife extends Application {
 
 	int width = 800;
 	int height = 800;
-	int rectangleSize = 50;
+	int rectSize = 50;
 	
 	boolean allowUserInput = true;
 	
 	Set<Rectangle> liveCells = new HashSet<>();
 	
 	public void clickCells(MouseEvent event,Set<Rectangle> liveCells, Pane pane) {		
-        // Get click coordinates
+        //Get click coordinates
         double x = event.getX();
         double y = event.getY();
 
-        final int adjustedX = (int) (x/rectangleSize)*rectangleSize;
-        final int adjustedY = (int) (y/rectangleSize)*rectangleSize;
+        final int adjustedX = (int) (x/rectSize)*rectSize;
+        final int adjustedY = (int) (y/rectSize)*rectSize;
         
         //remove a cell (square) if a there is a living cell already on that position
         pane.getChildren().removeIf(node -> node instanceof Rectangle && ((Rectangle) node).getX() == adjustedX && ((Rectangle) node).getY() == adjustedY);
@@ -42,7 +42,7 @@ public class GameOfLife extends Application {
         
         if (addRectangle) {
             // Create a square at the click location
-            Rectangle rect = new Rectangle(adjustedX, adjustedY, rectangleSize, rectangleSize);
+            Rectangle rect = new Rectangle(adjustedX, adjustedY, rectSize, rectSize);
             
             rect.setFill(Color.BLACK);
             rect.setArcWidth(20);
@@ -51,6 +51,36 @@ public class GameOfLife extends Application {
             liveCells.add(rect);
             pane.getChildren().add(rect);        	
         }
+	}
+	
+	public Set<Rectangle> cellsToDie(Set<Rectangle> rectangles) {	
+		
+		Set<Rectangle> cellsToDie = new HashSet<>();
+		for (Rectangle cell : rectangles ) {
+			int neighboors = numOfliveCellsAround(rectangles, (int) cell.getX(), (int) cell.getY());			
+			if (neighboors < 2 || neighboors >3) {
+				cellsToDie.add(cell);
+			}	
+		}
+		return cellsToDie;
+	}
+	
+	public int numOfliveCellsAround(Set<Rectangle>  liveCells, int x, int y) {
+		int neighboors = 0;
+		//calculate number of Moore neighbors	
+		for (Rectangle cell : liveCells ) {
+			if (cell.getX() == x-rectSize && cell.getY() == y-rectSize) neighboors++;
+			if (cell.getX() == x-rectSize && cell.getY() == y) neighboors++;
+			if (cell.getX() == x-rectSize && cell.getY() == y+rectSize) neighboors++;
+		
+			if (cell.getX() == x && cell.getY() == y-rectSize) neighboors++;
+			if (cell.getX() == x && cell.getY() == y+rectSize) neighboors++;
+						
+			if (cell.getX() == x+rectSize && cell.getY() == y-rectSize) neighboors++;
+			if (cell.getX() == x+rectSize && cell.getY() == y) neighboors++;
+			if (cell.getX() == x+rectSize && cell.getY() == y+rectSize) neighboors++;
+		}
+		return neighboors;
 	}
 	
     @Override
@@ -80,7 +110,9 @@ public class GameOfLife extends Application {
                 if (now - lastUpdateTime >= NANOS_PER_UPDATE) {
                 	
                     // Update the game state and render the new frame
-                	if (!allowUserInput) {      		
+                	if (!allowUserInput) {
+                		//evaluate which live cells will survive
+                		Set<Rectangle> cellsToDie = cellsToDie(liveCells);
                 		
                 	}
                     // Update last update time
