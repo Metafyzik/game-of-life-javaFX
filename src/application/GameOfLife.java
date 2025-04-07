@@ -119,7 +119,6 @@ public class GameOfLife extends Application {
         //start the game by pressing SPACE
         scene.setOnKeyPressed(e -> {
             if( e.getCode() == KeyCode.SPACE) {
-            	System.out.println("ENTER PRESSED; disable user input");
             	allowUserInput = false;
             }
         });
