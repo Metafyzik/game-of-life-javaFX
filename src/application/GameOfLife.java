@@ -10,8 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class GameOfLife extends Application {
@@ -26,9 +24,9 @@ public class GameOfLife extends Application {
 	
 	boolean allowUserInput = true;
 	
-	Set<Rectangle> liveCells = new HashSet<>();
+	Set<CellRect> liveCells = new HashSet<>();
 	
-	public void clickCells(MouseEvent event,Set<Rectangle> liveCells, Pane pane) {		
+	public void clickCells(MouseEvent event,Set<CellRect> liveCells, Pane pane) {		
         //Get click coordinates
         double x = event.getX();
         double y = event.getY();
@@ -37,27 +35,23 @@ public class GameOfLife extends Application {
         final int adjustedY = (int) (y/rectSize)*rectSize;
         
         //remove a cell (square) if a there is a living cell already on that position
-        pane.getChildren().removeIf(node -> node instanceof Rectangle && ((Rectangle) node).getX() == adjustedX && ((Rectangle) node).getY() == adjustedY);
-        boolean addRectangle = !(liveCells.removeIf(rect -> rect.getX() == adjustedX && rect.getY() == adjustedY));
+        pane.getChildren().removeIf(node -> node instanceof CellRect && ((CellRect) node).getX() == adjustedX && ((CellRect) node).getY() == adjustedY);
+        boolean addCellRect = !(liveCells.removeIf(rect -> rect.getX() == adjustedX && rect.getY() == adjustedY));
         
-        if (addRectangle) {
+        if (addCellRect) {
             // Create a square at the click location
-            Rectangle rect = new Rectangle(adjustedX, adjustedY, rectSize, rectSize);
-            
-            rect.setFill(Color.BLACK);
-            rect.setArcWidth(20);
-            rect.setArcHeight(20);
-            
+            CellRect rect = new CellRect(adjustedX, adjustedY);
+      
             liveCells.add(rect);
             pane.getChildren().add(rect);        	
         }
 	}
 	
-	public Set<Rectangle> cellsToDie(Set<Rectangle> rectangles) {	
+	public Set<CellRect> cellsToDie(Set<CellRect> liveCells) {	
 		
-		Set<Rectangle> cellsToDie = new HashSet<>();
-		for (Rectangle cell : rectangles ) {
-			int neighboors = numOfliveCellsAround(rectangles, (int) cell.getX(), (int) cell.getY());			
+		Set<CellRect> cellsToDie = new HashSet<>();
+		for (CellRect cell : liveCells ) {
+			int neighboors = numOfliveCellsAround(liveCells, (int) cell.getX(), (int) cell.getY());			
 			if (neighboors < 2 || neighboors >3) {
 				cellsToDie.add(cell);
 			}	
@@ -65,10 +59,10 @@ public class GameOfLife extends Application {
 		return cellsToDie;
 	}
 	
-	public int numOfliveCellsAround(Set<Rectangle>  liveCells, int x, int y) {
+	public int numOfliveCellsAround(Set<CellRect>  liveCells, int x, int y) {
 		int neighboors = 0;
 		//calculate number of Moore neighbors	
-		for (Rectangle cell : liveCells ) {
+		for (CellRect cell : liveCells ) {
 			if (cell.getX() == x-rectSize && cell.getY() == y-rectSize) neighboors++;
 			if (cell.getX() == x-rectSize && cell.getY() == y) neighboors++;
 			if (cell.getX() == x-rectSize && cell.getY() == y+rectSize) neighboors++;
@@ -112,7 +106,7 @@ public class GameOfLife extends Application {
                     // Update the game state and render the new frame
                 	if (!allowUserInput) {
                 		//evaluate which live cells will not survive
-                		Set<Rectangle> cellsToDie = cellsToDie(liveCells);
+                		Set<CellRect> cellsToDie = cellsToDie(liveCells);
                 		
                 	}
                     // Update last update time
