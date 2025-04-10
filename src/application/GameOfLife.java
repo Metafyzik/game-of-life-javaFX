@@ -6,16 +6,19 @@ import java.util.Set;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class GameOfLife extends Application {
 	
     private long lastUpdateTime = 0;
-    private final double FPS = 2;  // Target FPS
-    private final long NANOS_PER_UPDATE = 1_000_000_000 / (long) FPS;  // Time per frame in nanoseconds
+    private double FPS = 2;  // Target FPS
+    private long NANOS_PER_UPDATE = 1_000_000_000 / (long) FPS;  // Time per frame in nanoseconds
 
 	private final int width = Size.WINDOW_WIDTH;
 	private final int height = Size.WINDOW_HEIGHT;
@@ -106,21 +109,46 @@ public class GameOfLife extends Application {
     public void start(Stage primaryStage) {  	
         // Create a pane
         Pane pane = new Pane();
-        //create Scene
-        Scene scene = new Scene(pane, width, height);
-      
+
+        // Buttons
+        Button increaseBtn = new Button("faster");
+        Button decreaseBtn = new Button("slower");
+        Button startBtn = new Button("start");
+        
+        increaseBtn.setOnAction(e -> {
+            if (FPS < 50) {
+                FPS += 1;         
+                updateFrameInterval();
+            }
+        });
+
+        decreaseBtn.setOnAction(e -> {
+            if (FPS > 1) {
+                FPS -= 1;
+                updateFrameInterval();
+            }
+        });
+              
+        startBtn.setOnAction(e -> { 
+        	allowUserInput = !allowUserInput; 
+        	System.out.println(allowUserInput);
+        	if (allowUserInput) {
+        		startBtn.setText("start");
+        	} else {
+        		startBtn.setText("pause");
+        	}
+        });
+        
+        HBox controls = new HBox(10, increaseBtn, decreaseBtn, startBtn);
+        BorderPane root = new BorderPane();
+        root.setCenter(pane);
+        root.setBottom(controls);
+        
         // Adding and removing live cells from user input
         pane.setOnMouseClicked((MouseEvent event) -> {
         	if (allowUserInput) {
         		clickCells(event, liveCells, pane);
         	}
-        });
-        
-        //start the game by pressing SPACE
-        scene.setOnKeyPressed(e -> {
-            if( e.getCode() == KeyCode.SPACE) {
-            	allowUserInput = false;
-            }
         });
         
         // Game loop with fixed FPS using AnimationTimer
@@ -149,6 +177,17 @@ public class GameOfLife extends Application {
                 }
             }
         };
+        
+        //create Scene
+        Scene scene = new Scene(root, width, height);
+        
+        //start the game by pressing SPACE
+        scene.setOnKeyPressed(e -> {
+            if( e.getCode() == KeyCode.SPACE) {
+            	allowUserInput = false;
+            	System.out.println("SPACE");
+            }
+        });      
                 
         // Start the game loop
         gameLoop.start();
@@ -156,6 +195,12 @@ public class GameOfLife extends Application {
         primaryStage.setTitle("Game of Life");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    
+    
+    private void updateFrameInterval() {
+    	NANOS_PER_UPDATE = (long) (1_000_000_000 / FPS);
+        System.out.println("Updated FPS to: " + (int)FPS);
     }
     
     public static void main(String[] args) {
